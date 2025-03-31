@@ -7,6 +7,8 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -28,6 +30,7 @@ ATPSCharacter::ATPSCharacter()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+
 
 #pragma region InputSystem
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCDefaultRef(TEXT
@@ -52,6 +55,11 @@ ATPSCharacter::ATPSCharacter()
 	{
 		TurnAction = TurnActionRef.Object;
 	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> SprintActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Sprint.IA_Sprint'"));
+	if (SprintActionRef.Succeeded())
+	{
+		SprintAction = SprintActionRef.Object;
+	}
 #pragma endregion
 
 }
@@ -60,6 +68,7 @@ ATPSCharacter::ATPSCharacter()
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	if (PlayerController) 
@@ -93,6 +102,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Input_Move);
 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Input_Turn);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Input_Sprint);
 	}
 }
 
@@ -114,5 +124,18 @@ void ATPSCharacter::Input_Turn(const FInputActionValue& InputValue)
 {
 	float XValue = InputValue.Get<float>();
 	AddControllerYawInput(XValue);
+}
+
+void ATPSCharacter::Input_Sprint(const FInputActionValue&InputValue)
+{
+	bool isRun = InputValue.Get<bool>();
+	if (isRun)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	}
 }
 
