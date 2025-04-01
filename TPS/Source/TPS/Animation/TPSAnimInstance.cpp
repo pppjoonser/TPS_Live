@@ -7,7 +7,7 @@
 
 UTPSAnimInstance::UTPSAnimInstance()
 {
-	static ConstructorHelpers::FObjectFinder<UAnimMontage>FireMontageRef(TEXT(""));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage>FireMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/AM_Rifle_Fire.AM_Rifle_Fire'"));
 	if (FireMontageRef.Succeeded())
 	{
 		FireMontage = FireMontageRef.Object;
