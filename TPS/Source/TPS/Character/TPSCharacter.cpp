@@ -34,7 +34,7 @@ ATPSCharacter::ATPSCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 
-	static ConstructorHelpers::FClassFinder<AWeapon> WeaponClassRef(TEXT("/Script/Engine.Blueprint'/Game/BluePrint/BP_Weapon.BP_Weapon_C'"));
+	static ConstructorHelpers::FClassFinder<AWeapon> WeaponClassRef(TEXT("/Script/Engine.Blueprint'/Game/BluePrint/Weapon/BP_WeaponRifle.BP_WeaponRifle_C'"));
 	if (WeaponClassRef.Succeeded())
 	{
 		WeaponClass = WeaponClassRef.Class;
@@ -171,11 +171,24 @@ void ATPSCharacter::Input_Sprint(const FInputActionValue&InputValue)
 
 void ATPSCharacter::Input_Fire(const FInputActionValue& InputValue)
 {
-	UTPSAnimInstance* AnimInstance = Cast<UTPSAnimInstance>(GetMesh()->GetAnimInstance());
+	if (EquipWeapon == nullptr)
+		return;
 
-	if (AnimInstance)
+	UTPSAnimInstance* AnimInstance = Cast<UTPSAnimInstance>(GetMesh()->GetAnimInstance());
+	if (AnimInstance == nullptr)
+		return;
+
+	bool IsStartFire = InputValue.Get<bool>();
+	if (IsStartFire && EquipWeapon->GetAmmoRemainCount() > 0)
 	{
-		AnimInstance->PlayFireMontage();
+		EquipWeapon->StartFire(this);
 	}
+	else
+	{
+		EquipWeapon->StopFire();
+		AnimInstance->StopAllMontages(false);
+	}
+
+	AnimInstance->PlayFireMontage();
 }
 

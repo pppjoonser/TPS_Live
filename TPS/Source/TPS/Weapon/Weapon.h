@@ -6,6 +6,13 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+UENUM(BlueprintType)
+enum class EFireType : uint8
+{
+	EF_LineTrace  UMETA(DisplayName = "LineTrace"),
+	EF_Projectile  UMETA(DisplayName = "Projectile"),
+};
+
 UCLASS()
 class TPS_API AWeapon : public AActor
 {
@@ -25,17 +32,37 @@ public:
 
 public:
 	FORCEINLINE int32 GetAmmoMaxCount() { return AmmoMaxCount; }
-	FORCEINLINE int32 GetAmmoRemainCount() { return AmmoReminCount; }
+	FORCEINLINE int32 GetAmmoRemainCount() { return AmmoRemainCount; }
 	FORCEINLINE float GetReloadingDelayTime() { return ReloadingDelayTime; }
+public:
+	virtual void StartFire(TWeakObjectPtr<class ATPSCharacter> OwnerCharacter);
+	virtual void StopFire();
+	virtual void Reloading();
+	virtual void FinishReloading();
+public:
+	void PlayHitEffect(FTransform HitTransform);
 protected:
 	UPROPERTY(VisibleAnyWhere, BlueprintReadonly)
 	TObjectPtr<class USkeletalMeshComponent> WeaponMesh;
 
+	UPROPERTY(EditAnywhere, Category = HitEffect)
+	TObjectPtr<class UParticleSystem> HitEffect;
+
 	UPROPERTY(EditAnywhere, Category = Propertys)
 	int32 AmmoMaxCount = 30;
+
 	UPROPERTY(EditAnywhere, Category = Propertys)
-	int32 AmmoReminCount;
+	int32 AmmoRemainCount;
 
 	UPROPERTY(EditAnywhere, Category = Properties)
 	float ReloadingDelayTime = 3.0f;
+
+	UPROPERTY(EditAnywhere, Category = Properties)
+	float FireInterval = 0.1f;
+
+	UPROPERTY(EditAnywhere, Category = Properties)
+	float TraceDistance = 1000.0f;
+
+	UPROPERTY(EditAnywhere, Category = Properties)
+	EFireType FireType = EFireType::EF_Projectile;
 };

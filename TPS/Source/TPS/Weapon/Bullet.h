@@ -27,7 +27,10 @@ public:
 	void Fire(const FVector& Directon) const;
 
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* OnComponentHit, UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+protected:
+	UPROPERTY(EditAnywhere, Category = HitEffect)
+	TObjectPtr<class UParticleSystem> HitEffect;
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class USphereComponent> SphereCollision;
