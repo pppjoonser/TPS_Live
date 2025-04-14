@@ -59,7 +59,7 @@ void AWeapon::Reloading()
 
 void AWeapon::FinishReloading()
 {
-
+	AmmoRemainCount = AmmoMaxCount;
 }
 
 void AWeapon::PlayHitEffect(FTransform HitTransform)

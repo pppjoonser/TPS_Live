@@ -27,6 +27,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+public:
+	void StartReloading();
+	void FinishReloading();
 
 public:
 	void AttachWeapon(TSubclassOf<class AWeapon> NewWeapon);
@@ -41,6 +44,7 @@ private:
 	void Input_Turn(const FInputActionValue& InputValue);
 	void Input_Sprint(const FInputActionValue& InputValue);
 	void Input_Fire(const FInputActionValue& InputValue);
+	void Input_Reload(const FInputActionValue& InputValue);
 protected:
 	UPROPERTY(EditAnywhere, Category = "Input");
 	TObjectPtr<class UInputMappingContext> IMCDefault;
@@ -60,6 +64,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input");
 	TObjectPtr<class UInputAction> FireAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input");
+	TObjectPtr<class UInputAction> ReloadAction;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class USpringArmComponent> SpringArm;
@@ -67,9 +74,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UCameraComponent> Camera;
 
+	
+
 protected:
 	UPROPERTY(EditAnywhere, Category = PlayerStat)
 	float WalkSpeed = 200.0f;
 	UPROPERTY(EditAnywhere, Category = PlayerStat)
 	float RunSpeed = 600.0f;
+
+	UPROPERTY(EditAnywhere, Category = PlayerStat)
+	bool bIsReload = false;
 };

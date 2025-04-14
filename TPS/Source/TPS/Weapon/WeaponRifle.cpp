@@ -87,6 +87,13 @@ void AWeaponRifle::FireWithProjectile(TWeakObjectPtr<class ATPSCharacter> OwnerC
 			SpawnBullet->Fire(Direction);
 		}
 		AmmoRemainCount--;
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("AmmoRemain::%d"), AmmoRemainCount));
+		if (AmmoRemainCount <= 0)
+		{
+			Character->StopAnimMontage(Character->GetCurrentMontage());
+			StopFire();
+			Character->StartReloading();
+		}
 	}
 }
 
@@ -110,8 +117,7 @@ void AWeaponRifle::FireWithLineTrace(TWeakObjectPtr<class ATPSCharacter> OwnerCh
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(Character);
 
-	bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionParams);
-
+	bool HitDetected = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_GameTraceChannel1, CollisionParams);
 	if (HitDetected)
 	{
 		ACharacter* HitCharacter = Cast<ACharacter>(HitResult.GetActor());
@@ -126,6 +132,14 @@ void AWeaponRifle::FireWithLineTrace(TWeakObjectPtr<class ATPSCharacter> OwnerCh
 	}
 
 	AmmoRemainCount--;
+
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("AmmoRemain::%d"), AmmoRemainCount));
+	if (AmmoRemainCount <= 0)
+	{
+		Character->StopAnimMontage(Character->GetCurrentMontage());
+		StopFire();
+		Character->StartReloading();
+	}
 
 #if ENABLE_DRAW_DEBUG
 	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
