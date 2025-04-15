@@ -48,7 +48,7 @@ void UTPSEnemyAnimInstance::PlayHitMontage()
 
 void UTPSEnemyAnimInstance::PlayDeadMontage()
 {
-	FString SectionName = TEXT("Dead");
+	FString SectionName = TEXT("Death");
 	Montage_Play(HitMontage);
 	Montage_JumpToSection(*SectionName);
 }
