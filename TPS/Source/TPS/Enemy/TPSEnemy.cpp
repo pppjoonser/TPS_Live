@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Animation/TPSEnemyAnimInstance.h"
 #include "AI/EnemyAIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ATPSEnemy::ATPSEnemy()
@@ -17,6 +18,7 @@ ATPSEnemy::ATPSEnemy()
 
 
 	GetCapsuleComponent()->SetCollisionProfileName("TPSEnemy");
+	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 	if (MeshRef.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(MeshRef.Object);
@@ -31,7 +33,11 @@ void ATPSEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentHp = MaxHp;
-	
+	UTPSEnemyAnimInstance* AnimInstance = Cast<UTPSEnemyAnimInstance>(GetMesh()->GetAnimInstance());
+	if (AnimInstance)
+	{
+		AnimInstance->OnAttackFinished.AddUObject(this, &ATPSEnemy::AttackEnded);
+	}
 }
 
 // Called every frame
@@ -90,5 +96,19 @@ void ATPSEnemy::SetDead()
 			Destroy();
 		}),
 		5.0f, false);
+}
+
+void ATPSEnemy::AttackEnded()
+{
+
+}
+
+void ATPSEnemy::Attack()
+{
+	UTPSEnemyAnimInstance* EnemyAnimInstace = Cast<UTPSEnemyAnimInstance>(GetMesh()->GetAnimInstance());
+	if (EnemyAnimInstace)
+	{
+		EnemyAnimInstace->PlayAttackMontage();
+	}
 }
 

@@ -31,6 +31,8 @@ public:
 public:
 	void SetDamage();
 	void SetDead();
+	void AttackEnded();
+	void Attack();
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Stat)
