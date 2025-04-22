@@ -25,8 +25,19 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+public:
+	void SetHp(float Newhp);
+	void SetDead();
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CurrentHp = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxHp = 100.0f;
 public:
 	void StartReloading();
 	void FinishReloading();
