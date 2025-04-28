@@ -45,4 +45,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Stat)
 	float MaxHp = 100.0f;
 
+	UPROPERTY(VisibleAnywhere, Category = Stat)
+	TObjectPtr<class UWidgetComponent> HpBarWidgetComponent;
+
 };
