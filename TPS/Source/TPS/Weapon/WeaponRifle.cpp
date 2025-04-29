@@ -88,7 +88,7 @@ void AWeaponRifle::FireWithProjectile(TWeakObjectPtr<class ATPSCharacter> OwnerC
 		{
 			SpawnBullet->Fire(Direction);
 		}
-		AmmoRemainCount--;
+		SetAmmoRemainCount(AmmoRemainCount - 1);
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("AmmoRemain::%d"), AmmoRemainCount));
 		if (AmmoRemainCount <= 0)
 		{
@@ -136,7 +136,7 @@ void AWeaponRifle::FireWithLineTrace(TWeakObjectPtr<class ATPSCharacter> OwnerCh
 		PlayHitEffect(HitTransform);
 	}
 
-	AmmoRemainCount--;
+	SetAmmoRemainCount(AmmoRemainCount - 1);
 
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString::Printf(TEXT("AmmoRemain::%d"), AmmoRemainCount));
 	if (AmmoRemainCount <= 0)

@@ -4,6 +4,7 @@
 #include "Weapon/Weapon.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
+#include "Character/TPSCharacter.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -32,7 +33,7 @@ void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	AmmoRemainCount = AmmoMaxCount;
+	SetAmmoRemainCount(AmmoMaxCount);
 }
 
 // Called every frame
@@ -40,6 +41,17 @@ void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AWeapon::SetAmmoRemainCount(int32 NewAmmoRemainCount)
+{
+	AmmoRemainCount = NewAmmoRemainCount;
+
+	ATPSCharacter* OwnerCharacter = Cast<ATPSCharacter>(GetOwner());
+	if (OwnerCharacter)
+	{
+		OwnerCharacter->UpdateAmmoCount(AmmoRemainCount, AmmoMaxCount);
+	}
 }
 
 void AWeapon::StartFire(TWeakObjectPtr<class ATPSCharacter> OwnerCharacter)
@@ -59,7 +71,7 @@ void AWeapon::Reloading()
 
 void AWeapon::FinishReloading()
 {
-	AmmoRemainCount = AmmoMaxCount;
+	SetAmmoRemainCount(AmmoMaxCount);
 }
 
 void AWeapon::PlayHitEffect(FTransform HitTransform)

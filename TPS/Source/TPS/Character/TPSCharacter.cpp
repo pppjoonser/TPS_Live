@@ -13,6 +13,8 @@
 #include"Engine/SkeletalMeshSocket.h"
 #include "Weapon/Weapon.h"
 #include "Components/CapsuleComponent.h"
+#include "Blueprint/UserWidget.h"
+#include "UI/TPSPlayerHUDWidget.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -42,9 +44,17 @@ ATPSCharacter::ATPSCharacter()
 	{
 		WeaponClass = WeaponClassRef.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<UTPSPlayerHUDWidget> PlayerHUBWidgetRef(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_PlayerHUD.WBP_PlayerHUD_C'"));
+
+	if (PlayerHUBWidgetRef.Succeeded())
+	{
+		TPSPlayerHUDWidgetClass = PlayerHUBWidgetRef.Class;
+	}
 #pragma region InputSystem
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCDefaultRef(TEXT
-	("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCDefaultRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
+
+
 	if (IMCDefaultRef.Succeeded()) 
 	{
 		IMCDefault = IMCDefaultRef.Object;
@@ -89,12 +99,21 @@ void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		TPSPlayerHUDWidget = CreateWidget<UTPSPlayerHUDWidget>(PlayerController, TPSPlayerHUDWidgetClass);
+
+		if (TPSPlayerHUDWidget)
+		{
+			TPSPlayerHUDWidget->AddToViewport();
+		}
+	}
+
 	SetHp(MaxHp);
 
 	AttachWeapon(WeaponClass);
 
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	if (PlayerController) 
 	{
 		auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>
@@ -147,12 +166,25 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 void ATPSCharacter::SetHp(float Newhp)
 {
 	CurrentHp = FMath::Clamp<float>(Newhp, 0.0f, MaxHp);
+
+	if (TPSPlayerHUDWidget)
+	{
+		TPSPlayerHUDWidget->UpdateHpBar(CurrentHp, MaxHp);
+	}
 }
 
 void ATPSCharacter::SetDead()
 {
 	SetActorEnableCollision(false);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+}
+
+void ATPSCharacter::UpdateAmmoCount(int32 AmmoRemainCount, int32 AmmoMaxCount)
+{
+	if (TPSPlayerHUDWidget)
+	{
+		TPSPlayerHUDWidget->UpdateAmmo(AmmoRemainCount, AmmoMaxCount);
+	}
 }
 
 void ATPSCharacter::StartReloading()
@@ -191,7 +223,9 @@ void ATPSCharacter::AttachWeapon(TSubclassOf<class AWeapon> NewWeapon)
 {
 	if (NewWeapon)
 	{
-		EquipWeapon = GetWorld()->SpawnActor<AWeapon>(NewWeapon);
+		FActorSpawnParameters PawnParams;
+		PawnParams.Owner = this;
+		EquipWeapon = GetWorld()->SpawnActor<AWeapon>(NewWeapon, PawnParams);
 
 		const USkeletalMeshSocket* WeaponSocket = GetMesh()->GetSocketByName("WeaponSocket");
 

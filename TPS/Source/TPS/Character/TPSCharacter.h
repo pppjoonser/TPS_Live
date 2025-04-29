@@ -32,7 +32,14 @@ public:
 public:
 	void SetHp(float Newhp);
 	void SetDead();
+	void UpdateAmmoCount(int32 AmmoRemainCount, int32 AmmoMaxCount);
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<class UTPSPlayerHUDWidget> TPSPlayerHUDWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UTPSPlayerHUDWidget> TPSPlayerHUDWidget;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CurrentHp = 0.0f;
 
